@@ -1,5 +1,5 @@
 import random, unittest
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 from typing import Optional
 
 # Returns cards in rank, suit order. Rank order
@@ -23,11 +23,43 @@ def sample(
 ) -> float:
     if not deck:
         deck = fresh_deck()
-    matches = 0
+    nmatches = 0
     for _ in range(ntrials):
         drawn: list[int] = random.sample(deck, ncards)
-        matches += int(check(drawn))
-    return matches / ntrials
+        nmatches += int(check(drawn))
+    return nmatches / ntrials
+
+def draws(
+    deck: list[int],
+    ncards: int,
+    start: int = 0,
+) -> Generator[list[int]]:
+    ndeck = len(deck)
+
+    assert ncards >= 0
+    assert ndeck - ncards >= 0
+    if ncards == 0:
+        yield []
+        return None
+
+    for i in range(start, ndeck - ncards + 1):
+        first = deck[i]
+        for rest in draws(deck, ncards - 1, start=i + 1):
+            yield [first] + rest
+
+def sample_all(
+    ncards: int,
+    check: Callable[[list[int]], bool],
+    deck: Optional[list[int]] = None,
+) -> tuple[int, int]:
+    if not deck:
+        deck = fresh_deck()
+    nmatches = 0
+    ntrials = 0
+    for drawn in draws(deck, ncards):
+        nmatches += int(check(drawn))
+        ntrials += 1
+    return nmatches, ntrials
 
 # https://www.dataquest.io/blog/unit-tests-python/
 class TestCalculations(unittest.TestCase):
@@ -50,6 +82,12 @@ class TestCalculations(unittest.TestCase):
     def test_sample(self):
         p = sample(1000, 1, lambda d: rank(d[0]) == 0)
         self.assertTrue(abs(p - 1/13) < 0.1)
+
+    def test_draws(self):
+        deck = [0, 1, 2, 3]
+        got = [d for d in draws(deck, 2)]
+        expected = [[0, 1], [0, 2], [0, 3], [1, 2], [1, 3], [2, 3]]
+        self.assertEqual(got, expected)
 
 if __name__ == '__main__':
     unittest.main()
