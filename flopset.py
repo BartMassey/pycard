@@ -24,7 +24,7 @@ p_calced = 1.0 - nmisses / ndraws
 # Sampled probability. Without loss of generality,
 # we will hold pocket aces.
 p_sampled = sample(
-    100_000,
+    1_000_000,
     3,
     lambda draw: any(rank(c) == 1 for c in draw),
     deck=fresh_deck()[2:],
