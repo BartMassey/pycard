@@ -30,5 +30,14 @@ p_sampled = sample(
     deck=fresh_deck()[2:],
 )
 
+# "Exact sampled" probability. This is computed over all
+# possible draws.
+found, total = sample_all(
+    3,
+    lambda draw: any(rank(c) == 1 for c in draw),
+    deck=fresh_deck()[2:],
+)
+p_counted = found / total
+
 # These should agree to at least 2 decimal places.
-print(p_known, p_calced, p_sampled)
+print(p_known, p_calced, p_sampled, p_counted)
