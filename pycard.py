@@ -9,7 +9,7 @@ def fresh_deck() -> list[int]:
 
 # Rank is 1 for A, 11 for J, 12 for Q, 13 for K
 def rank(c: int) -> int:
-    return c // 13 + 1
+    return c // 4 + 1
 
 # Suit is 0 for Clubs, 1 for Diamonds, 2 for Hearts, 3 for Spades.
 def suit(c: int) -> int:
@@ -31,6 +31,20 @@ def sample(
 
 # https://www.dataquest.io/blog/unit-tests-python/
 class TestCalculations(unittest.TestCase):
+
+    def test_rank(self):
+        deck = fresh_deck()
+        for r in range(1, 14):
+            for i in range(4 * (r - 1), 4 * (r - 1) + 4):
+                self.assertEqual(rank(deck[i]), r)
+            self.assertEqual(sum(int(rank(c) == r) for c in deck), 4)
+
+    def test_suit(self):
+        deck = fresh_deck()
+        for s in range(4):
+            for i in range(s, 52, 4):
+                self.assertEqual(suit(deck[i]), s)
+            self.assertEqual(sum(int(suit(c) == s) for c in deck), 13)
 
     # XXX This test will accidentally fail with very low probability.
     def test_sample(self):
