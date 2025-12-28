@@ -15,6 +15,20 @@ def rank(c: int) -> int:
 def suit(c: int) -> int:
     return c % 4
 
+def card(rank: int, suit: int) -> int:
+    return (rank - 1) * 4 + suit
+
+def contains_rank(cards: list[int], for_rank: int) -> bool:
+    return any(rank(c) == for_rank for c in cards)
+
+def remove_card(deck: list[int], card: int) -> bool:
+    index = deck.index(card)
+    if index == -1:
+        return False
+    last = deck.pop()
+    deck[index] = last
+    return True
+
 def sample(
     ntrials: int,
     ncards: int,
